@@ -17,7 +17,7 @@ public typealias SystemTextView = NSTextView
 public typealias SystemScrollView = NSScrollView
 
 let defaultEditorFont = NSFont.systemFont(ofSize: 24.0)
-let defaultEditorTextColor = NSColor.labelColor
+let defaultEditorTextColor = NSColor.init(white: 1, alpha: 0.9)
 
 #else
 import UIKit
