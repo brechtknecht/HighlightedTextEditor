@@ -155,9 +155,10 @@ public extension HighlightedTextEditor {
 
         public lazy var scrollView: NSScrollView = {
             let scrollView = NSScrollView()
-            scrollView.drawsBackground = true
+            scrollView.drawsBackground = false
             scrollView.borderType = .noBorder
-            scrollView.hasVerticalScroller = true
+            // HOOK: Disabled scrolling for container
+            scrollView.hasVerticalScroller = false
             scrollView.hasHorizontalRuler = false
             scrollView.autoresizingMask = [.width, .height]
             scrollView.translatesAutoresizingMaskIntoConstraints = false

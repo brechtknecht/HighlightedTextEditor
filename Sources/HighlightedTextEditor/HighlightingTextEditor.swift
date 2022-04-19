@@ -110,10 +110,12 @@ extension HighlightingTextEditor {
         
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = 5
+        paragraphStyle.paragraphSpacing = 7
 
         highlightedString.addAttribute(.font, value: editorFont, range: all)
         highlightedString.addAttribute(.foregroundColor, value: editorTextColor, range: all)
         highlightedString.addAttribute(.ligature, value: 2, range: all)
+        highlightedString.addAttribute(.kern, value: +0.14, range: all)
         highlightedString.addAttribute(NSAttributedString.Key.paragraphStyle, value: paragraphStyle, range: all)
         
 
