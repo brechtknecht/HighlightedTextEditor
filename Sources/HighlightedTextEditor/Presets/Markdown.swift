@@ -36,7 +36,7 @@ private let htmlRegex = try! NSRegularExpression(
 )
 
 #if os(macOS)
-let codeFont = NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize * 1.35, weight: .regular)
+let codeFont = NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize * 1.3, weight: .regular)
 let headingTraits: NSFontDescriptor.SymbolicTraits = [.bold, .expanded]
 let boldTraits: NSFontDescriptor.SymbolicTraits = [.bold]
 let emphasisTraits: NSFontDescriptor.SymbolicTraits = [.italic]
