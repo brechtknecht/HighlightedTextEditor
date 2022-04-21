@@ -27,6 +27,8 @@ private let buttonRegex = try! NSRegularExpression(pattern: "<\\s*button[^>]*>(.
 private let strikethroughRegex = try! NSRegularExpression(pattern: "(~)((?!\\1).)+\\1", options: [])
 private let tagRegex = try! NSRegularExpression(pattern: "^\\[([^\\[\\]]*)\\]:", options: [.anchorsMatchLines])
 private let footnoteRegex = try! NSRegularExpression(pattern: "\\[\\^(.*?)\\]", options: [])
+private let betweenBackticksConverted = try! NSRegularExpression(pattern: "(?<=\\U00000002).*?(?=\\U00000087)", options: [])
+
 // courtesy https://www.regular-expressions.info/examples.html
 private let htmlRegex = try! NSRegularExpression(
     pattern: "<([A-Z][A-Z0-9]*)\\b[^>]*>(.*?)</\\1>",
@@ -39,7 +41,7 @@ let headingTraits: NSFontDescriptor.SymbolicTraits = [.bold, .expanded]
 let boldTraits: NSFontDescriptor.SymbolicTraits = [.bold]
 let emphasisTraits: NSFontDescriptor.SymbolicTraits = [.italic]
 let boldEmphasisTraits: NSFontDescriptor.SymbolicTraits = [.bold, .italic]
-let secondaryBackground = NSColor.windowBackgroundColor
+let secondaryBackground = NSColor(red: 255, green: 255, blue: 255, alpha: 0.14)
 let lighterColor = NSColor.lightGray
 let textColor = NSColor.labelColor
 #else
@@ -58,7 +60,20 @@ private let maxHeadingLevel = 6
 public extension Sequence where Iterator.Element == HighlightRule {
     static var markdown: [HighlightRule] {
         [
-            HighlightRule(pattern: inlineCodeRegex, formattingRule: TextFormattingRule(key: .font, value: codeFont)),
+            HighlightRule(
+                pattern: inlineCodeRegex,
+                formattingRules: [
+                    TextFormattingRule(key: .font, value: codeFont),
+                    TextFormattingRule(key: .backgroundColor, value: secondaryBackground)
+                ]
+            ),
+            HighlightRule(
+                pattern: betweenBackticksConverted,
+                formattingRules: [
+                    TextFormattingRule(key: .font, value: codeFont),
+                    TextFormattingRule(key: .backgroundColor, value: secondaryBackground)
+                ]
+            ),
             HighlightRule(pattern: codeBlockRegex, formattingRule: TextFormattingRule(key: .font, value: codeFont)),
             HighlightRule(pattern: headingRegex, formattingRules: [
                 TextFormattingRule(fontTraits: headingTraits),
