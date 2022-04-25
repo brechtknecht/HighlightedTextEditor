@@ -175,7 +175,6 @@ public extension HighlightedTextEditor {
             
             let textContainer = NSTextContainer(containerSize: scrollView.frame.size)
             textContainer.widthTracksTextView = true
-            textContainer.heightTracksTextView = true
 
             textContainer.containerSize = NSSize(
                 width: contentSize.width,
@@ -312,12 +311,16 @@ final class TokenLayoutManager: NSLayoutManager {
     //    }
      
     override func drawGlyphs(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
-        let characterRange = self.characterRange(forGlyphRange: glyphsToShow, actualGlyphRange: nil)
+        // DANGER ZONE #001 : Check this Range changes
+        let manipulatedRange = NSRange(location: glyphsToShow.location, length: glyphsToShow.length + 1)
+        let characterRange = self.characterRange(forGlyphRange: manipulatedRange, actualGlyphRange: nil)
+        
         textStorage?.enumerateAttribute(.token, in: characterRange, options: .longestEffectiveRangeNotRequired, using: { (value, subrange, _) in
             guard let token = value as? String, !token.isEmpty else { return }
             let tokenGlypeRange = glyphRange(forCharacterRange: subrange, actualCharacterRange: nil)
             drawToken(forGlyphRange: tokenGlypeRange)
         })
+        
         super.drawGlyphs(forGlyphRange: glyphsToShow, at: origin)
     }
      
@@ -329,14 +332,6 @@ final class TokenLayoutManager: NSLayoutManager {
             NSColor(red: 255, green: 255, blue: 255, alpha: 0.14).setFill()
             NSBezierPath(roundedRect: tokenRect, xRadius: 4, yRadius: 4).fill()
         }
-    }
-    
-    private func fixHighlightRect(rect: CGRect) -> CGRect {
-        var fixedRect = rect
-        let fixOffset: CGFloat = 6.0
-        fixedRect.size.height -= fixOffset;
-        fixedRect.origin.y += fixOffset;
-        return rect;
     }
 }
 

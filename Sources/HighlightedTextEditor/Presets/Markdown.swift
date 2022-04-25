@@ -69,14 +69,13 @@ public extension Sequence where Iterator.Element == HighlightRule {
                 pattern: inlineCodeRegex,
                 formattingRules: [
                     TextFormattingRule(key: .font, value: codeFont),
-                    TextFormattingRule(key: .backgroundColor, value: secondaryBackgroundWithoutTransparency)
+                    TextFormattingRule(key: .token, value: "value"),
                 ]
             ),
             HighlightRule(
                 pattern: betweenBackticksConverted,
                 formattingRules: [
                     TextFormattingRule(key: .font, value: codeFont),
-//                    TextFormattingRule(key: .backgroundColor, value: secondaryBackgroundWithoutTransparency),
                     TextFormattingRule(key: .token, value: "value"),
                 ]
             ),
