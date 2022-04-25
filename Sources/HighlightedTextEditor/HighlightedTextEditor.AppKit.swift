@@ -333,16 +333,16 @@ class CustomLayoutManager: NSLayoutManager {
             let lastRect = rectCount - 1
             
             path.move(to: CGPoint(x: rectArray[0].minX + cornerRadius, y: rectArray[0].maxY + cornerRadius))
-
+            
             path.move(to: CGPoint(x: rectArray[0].minX + cornerRadius, y: rectArray[0].minY + cornerRadius))
             path.move(to: CGPoint(x: rectArray[0].maxX - cornerRadius, y: rectArray[0].minY + cornerRadius))
-
+            
             path.move(to: CGPoint(x: rectArray[0].maxX - cornerRadius, y: rectArray[lastRect].minY - cornerRadius))
             path.move(to: CGPoint(x: rectArray[lastRect].maxX - cornerRadius, y: rectArray[lastRect].minY - cornerRadius))
-
+            
             path.move(to: CGPoint(x: rectArray[lastRect].maxX - cornerRadius, y: rectArray[lastRect].maxY - cornerRadius))
             path.move(to: CGPoint(x: rectArray[lastRect].minX + cornerRadius, y: rectArray[lastRect].maxY - cornerRadius))
-
+            
             path.move(to: CGPoint(x: rectArray[lastRect].minX + cornerRadius, y: rectArray[0].maxY + cornerRadius))
             
             path.closeSubpath();
@@ -351,10 +351,6 @@ class CustomLayoutManager: NSLayoutManager {
         }
         
         color.set()
-        
-        
-        //            let rect = CGRect(x: rectArray[0].minX, y: rectArray[0].maxY + cornerRadius - 30, width: 20, height: 20)
-        //            path.addRoundedRect(in: rect, cornerWidth: 3, cornerHeight: 3)
         
         let ctx = NSGraphicsContext.current?.cgContext
         ctx!.setLineWidth(cornerRadius * 2.0)
