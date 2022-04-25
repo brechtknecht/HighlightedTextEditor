@@ -170,11 +170,13 @@ public extension HighlightedTextEditor {
             let contentSize = scrollView.contentSize
             let textStorage = NSTextStorage()
             
-            let layoutManager = CustomLayoutManager()
+            let layoutManager = TokenLayoutManager()
             textStorage.addLayoutManager(layoutManager)
             
             let textContainer = NSTextContainer(containerSize: scrollView.frame.size)
             textContainer.widthTracksTextView = true
+            textContainer.heightTracksTextView = true
+
             textContainer.containerSize = NSSize(
                 width: contentSize.width,
                 height: CGFloat.greatestFiniteMagnitude
@@ -286,13 +288,9 @@ public extension HighlightedTextEditor {
 //
 //  Created by Felix Tesche on 25.04.22.
 //
-
-
-class CustomLayoutManager: NSLayoutManager {
-    
-    override init() { super.init() }
-    
-    required init?(coder: NSCoder) { super.init(coder: coder) }
+ 
+final class TokenLayoutManager: NSLayoutManager {
+    var textContainerOriginOffset: CGSize = .zero
     
     //    override func drawBackground(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
     //        super.drawBackground(forGlyphRange: glyphsToShow, at: origin)
@@ -312,54 +310,25 @@ class CustomLayoutManager: NSLayoutManager {
     //            currentContext?.restoreGState()
     //        }
     //    }
-    
-    
-    // Unused ATM
-    override func fillBackgroundRectArray(_ rectArray: UnsafePointer<CGRect>, count rectCount: Int, forCharacterRange charRange: NSRange, color: NSColor) {
-        
-        let cornerRadius:CGFloat = 4.0
-        let path : CGMutablePath = CGMutablePath.init()
-        
-        if rectCount == 1 || (rectCount == 2 && (rectArray[1].maxX < rectArray[0].maxX)) {
-            
-            path.addRect(rectArray[0].insetBy(dx: cornerRadius, dy: cornerRadius))
-            
-            if rectCount == 2 {
-                path.addRect(rectArray[1].insetBy(dx: cornerRadius, dy: cornerRadius))
-            }
-            
-        } else {
-            
-            let lastRect = rectCount - 1
-            
-            path.move(to: CGPoint(x: rectArray[0].minX + cornerRadius, y: rectArray[0].maxY + cornerRadius))
-            
-            path.move(to: CGPoint(x: rectArray[0].minX + cornerRadius, y: rectArray[0].minY + cornerRadius))
-            path.move(to: CGPoint(x: rectArray[0].maxX - cornerRadius, y: rectArray[0].minY + cornerRadius))
-            
-            path.move(to: CGPoint(x: rectArray[0].maxX - cornerRadius, y: rectArray[lastRect].minY - cornerRadius))
-            path.move(to: CGPoint(x: rectArray[lastRect].maxX - cornerRadius, y: rectArray[lastRect].minY - cornerRadius))
-            
-            path.move(to: CGPoint(x: rectArray[lastRect].maxX - cornerRadius, y: rectArray[lastRect].maxY - cornerRadius))
-            path.move(to: CGPoint(x: rectArray[lastRect].minX + cornerRadius, y: rectArray[lastRect].maxY - cornerRadius))
-            
-            path.move(to: CGPoint(x: rectArray[lastRect].minX + cornerRadius, y: rectArray[0].maxY + cornerRadius))
-            
-            path.closeSubpath();
-            
-            
+     
+    override func drawGlyphs(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
+        let characterRange = self.characterRange(forGlyphRange: glyphsToShow, actualGlyphRange: nil)
+        textStorage?.enumerateAttribute(.token, in: characterRange, options: .longestEffectiveRangeNotRequired, using: { (value, subrange, _) in
+            guard let token = value as? String, !token.isEmpty else { return }
+            let tokenGlypeRange = glyphRange(forCharacterRange: subrange, actualCharacterRange: nil)
+            drawToken(forGlyphRange: tokenGlypeRange)
+        })
+        super.drawGlyphs(forGlyphRange: glyphsToShow, at: origin)
+    }
+     
+    private func drawToken(forGlyphRange tokenGlypeRange: NSRange) {
+        guard let textContainer = textContainer(forGlyphAt: tokenGlypeRange.location, effectiveRange: nil) else { return }
+        let withinRange = NSRange(location: NSNotFound, length: 0)
+        enumerateEnclosingRects(forGlyphRange: tokenGlypeRange, withinSelectedGlyphRange: withinRange, in: textContainer) { (rect, _) in
+            let tokenRect = rect.offsetBy(dx: self.textContainerOriginOffset.width, dy: self.textContainerOriginOffset.height - 1.5)
+            NSColor(red: 255, green: 255, blue: 255, alpha: 0.14).setFill()
+            NSBezierPath(roundedRect: tokenRect, xRadius: 4, yRadius: 4).fill()
         }
-        
-        color.set()
-        
-        let ctx = NSGraphicsContext.current?.cgContext
-        ctx!.setLineWidth(cornerRadius * 2.0)
-        ctx!.setLineJoin(.round)
-        
-        ctx!.addPath(path)
-        
-        ctx!.drawPath(using: .fillStroke)
-        
     }
     
     private func fixHighlightRect(rect: CGRect) -> CGRect {

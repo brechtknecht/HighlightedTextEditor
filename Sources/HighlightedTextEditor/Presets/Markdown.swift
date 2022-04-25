@@ -58,6 +58,10 @@ let textColor = UIColor.label
 
 private let maxHeadingLevel = 6
 
+extension NSAttributedString.Key {
+    static let token = NSAttributedString.Key("Token")
+}
+
 public extension Sequence where Iterator.Element == HighlightRule {
     static var markdown: [HighlightRule] {
         [
@@ -72,7 +76,8 @@ public extension Sequence where Iterator.Element == HighlightRule {
                 pattern: betweenBackticksConverted,
                 formattingRules: [
                     TextFormattingRule(key: .font, value: codeFont),
-                    TextFormattingRule(key: .backgroundColor, value: secondaryBackgroundWithoutTransparency),
+//                    TextFormattingRule(key: .backgroundColor, value: secondaryBackgroundWithoutTransparency),
+                    TextFormattingRule(key: .token, value: "value"),
                 ]
             ),
             HighlightRule(pattern: codeBlockRegex, formattingRule: TextFormattingRule(key: .font, value: codeFont)),
