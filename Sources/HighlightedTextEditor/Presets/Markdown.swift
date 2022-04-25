@@ -62,7 +62,10 @@ extension NSAttributedString.Key {
     static let token = NSAttributedString.Key("Token")
 }
 
+
 public extension Sequence where Iterator.Element == HighlightRule {
+    
+    
     static var markdown: [HighlightRule] {
         [
             HighlightRule(
