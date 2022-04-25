@@ -162,6 +162,7 @@ public extension HighlightedTextEditor {
             scrollView.hasHorizontalRuler = false
             scrollView.autoresizingMask = [.width, .height]
             scrollView.translatesAutoresizingMaskIntoConstraints = false
+            scrollView.verticalScrollElasticity = .automatic
             
             return scrollView
         }()
@@ -187,12 +188,14 @@ public extension HighlightedTextEditor {
             textView.autoresizingMask = .width
             textView.backgroundColor = NSColor.textBackgroundColor
             textView.delegate = self.delegate
-            textView.drawsBackground = true
+            textView.drawsBackground = false
             textView.isHorizontallyResizable = false
             textView.isVerticallyResizable = true
-            textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+            textView.maxSize = NSSize(width: 120, height: CGFloat.greatestFiniteMagnitude)
             textView.minSize = NSSize(width: 0, height: contentSize.height)
             textView.textColor = NSColor.labelColor
+
+
             
             return textView
         }()
@@ -328,7 +331,7 @@ final class TokenLayoutManager: NSLayoutManager {
         guard let textContainer = textContainer(forGlyphAt: tokenGlypeRange.location, effectiveRange: nil) else { return }
         let withinRange = NSRange(location: NSNotFound, length: 0)
         enumerateEnclosingRects(forGlyphRange: tokenGlypeRange, withinSelectedGlyphRange: withinRange, in: textContainer) { (rect, _) in
-            let tokenRect = rect.offsetBy(dx: self.textContainerOriginOffset.width, dy: self.textContainerOriginOffset.height - 1.5)
+            let tokenRect = rect.offsetBy(dx: self.textContainerOriginOffset.width + 64, dy: self.textContainerOriginOffset.height - 1.5 + 32)
             NSColor(red: 255, green: 255, blue: 255, alpha: 0.14).setFill()
             NSBezierPath(roundedRect: tokenRect, xRadius: 4, yRadius: 4).fill()
         }
