@@ -332,7 +332,7 @@ final class TokenLayoutManager: NSLayoutManager {
         let withinRange = NSRange(location: NSNotFound, length: 0)
         enumerateEnclosingRects(forGlyphRange: tokenGlypeRange, withinSelectedGlyphRange: withinRange, in: textContainer) { (rect, _) in
             let tokenRect = rect.offsetBy(dx: self.textContainerOriginOffset.width + 64, dy: self.textContainerOriginOffset.height - 1.5 + 32)
-            NSColor(red: 255, green: 255, blue: 255, alpha: 0.14).setFill()
+            NSColor(named: "accentColor")?.setFill()
             NSBezierPath(roundedRect: tokenRect, xRadius: 4, yRadius: 4).fill()
         }
     }
