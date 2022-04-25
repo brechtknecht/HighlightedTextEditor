@@ -118,6 +118,7 @@ extension HighlightingTextEditor {
         highlightedString.addAttribute(.ligature, value: 2, range: all)
         highlightedString.addAttribute(.kern, value: +0.23, range: all)
         highlightedString.addAttribute(NSAttributedString.Key.paragraphStyle, value: paragraphStyle, range: all)
+
         
 
         highlightRules.forEach { rule in
