@@ -12,6 +12,7 @@
 import AppKit
 import Combine
 import SwiftUI
+import CoreGraphics //Important to draw the rectangles
 
 public struct HighlightedTextEditor: NSViewRepresentable, HighlightingTextEditor {
     public struct Internals {
@@ -105,7 +106,7 @@ public extension HighlightedTextEditor {
         public func textDidChange(_ notification: Notification) {
             guard let textView = notification.object as? NSTextView else { return }
             let content = String(textView.textStorage?.string ?? "")
-
+            
             parent.text = content
             selectedRanges = textView.selectedRanges
         }
@@ -157,8 +158,7 @@ public extension HighlightedTextEditor {
             let scrollView = NSScrollView()
             scrollView.drawsBackground = false
             scrollView.borderType = .noBorder
-            // HOOK: Disabled scrolling for container
-            scrollView.hasVerticalScroller = false
+            scrollView.hasVerticalScroller = true
             scrollView.hasHorizontalRuler = false
             scrollView.autoresizingMask = [.width, .height]
             scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -170,7 +170,7 @@ public extension HighlightedTextEditor {
             let contentSize = scrollView.contentSize
             let textStorage = NSTextStorage()
 
-            let layoutManager = NSLayoutManager()
+            let layoutManager = CustomLayoutManager()
             textStorage.addLayoutManager(layoutManager)
 
             let textContainer = NSTextContainer(containerSize: scrollView.frame.size)
@@ -278,3 +278,85 @@ public extension HighlightedTextEditor {
     }
 }
 #endif
+
+
+//
+//  TextBackgroundExtension.swift
+//  Sticky Notes
+//
+//  Created by Felix Tesche on 25.04.22.
+//
+
+
+class CustomLayoutManager: NSLayoutManager {
+
+    override init() { super.init() }
+
+    required init?(coder: NSCoder) { super.init(coder: coder) }
+
+    override func drawBackground(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
+        super.drawBackground(forGlyphRange: glyphsToShow, at: origin)
+
+        self.enumerateLineFragments(forGlyphRange: glyphsToShow) { (rect, usedRect, textContainer, glyphRange, stop) in
+
+            var lineRect = usedRect
+            lineRect.size.height = 30.0
+
+            let currentContext = NSGraphicsContext.current?.cgContext
+            currentContext?.saveGState()
+
+            currentContext?.setStrokeColor(NSColor.red.cgColor)
+            currentContext?.setLineWidth(1.0)
+            currentContext?.stroke(lineRect)
+
+            currentContext?.restoreGState()
+        }
+    }
+    
+    override func fillBackgroundRectArray(_ rectArray: UnsafePointer<CGRect>, count rectCount: Int, forCharacterRange charRange: NSRange, color: NSColor) {
+
+            let cornerRadius:CGFloat = 5.0
+            let path : CGMutablePath = CGMutablePath.init()
+            
+        if rectCount == 1 || (rectCount == 2 && (rectArray[1].maxX < rectArray[0].maxX)) {
+            
+            path.addRect(rectArray[0].insetBy(dx: cornerRadius, dy: cornerRadius))
+                
+            if rectCount == 2 {
+                path.addRect(rectArray[1].insetBy(dx: cornerRadius, dy: cornerRadius))
+            }
+                
+            } else {
+                
+                let lastRect = rectCount - 1
+                
+                path.move(to: CGPoint(x: rectArray[0].minX + cornerRadius, y: rectArray[0].maxY + cornerRadius))
+                
+                
+                path.move(to: CGPoint(x: rectArray[0].minX + cornerRadius, y: rectArray[0].minY + cornerRadius))
+                path.move(to: CGPoint(x: rectArray[0].maxX - cornerRadius, y: rectArray[0].minY + cornerRadius))
+                    
+                path.move(to: CGPoint(x: rectArray[0].maxX - cornerRadius, y: rectArray[lastRect].minY - cornerRadius))
+                path.move(to: CGPoint(x: rectArray[lastRect].maxX - cornerRadius, y: rectArray[lastRect].minY - cornerRadius))
+                
+                path.move(to: CGPoint(x: rectArray[lastRect].maxX - cornerRadius, y: rectArray[lastRect].maxY - cornerRadius))
+                path.move(to: CGPoint(x: rectArray[lastRect].minX + cornerRadius, y: rectArray[lastRect].maxY - cornerRadius))
+                
+                path.move(to: CGPoint(x: rectArray[lastRect].minX + cornerRadius, y: rectArray[0].maxY + cornerRadius))
+                
+                path.closeSubpath();
+            }
+            
+            color.set()
+            
+            let ctx = NSGraphicsContext.current?.cgContext
+            ctx!.setLineWidth(cornerRadius * 2.0)
+            ctx!.setLineJoin(.round)
+            
+            ctx!.addPath(path)
+            
+            ctx!.drawPath(using: .fillStroke)
+
+        }
+}
+
