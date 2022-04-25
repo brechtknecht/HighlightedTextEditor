@@ -119,6 +119,7 @@ extension HighlightingTextEditor {
         highlightedString.addAttribute(.kern, value: +0.23, range: all)
         highlightedString.addAttribute(NSAttributedString.Key.paragraphStyle, value: paragraphStyle, range: all)
         
+
         highlightRules.forEach { rule in
             let matches = rule.pattern.matches(in: text, options: [], range: all)
             matches.forEach { match in

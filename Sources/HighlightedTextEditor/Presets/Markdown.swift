@@ -42,6 +42,7 @@ let boldTraits: NSFontDescriptor.SymbolicTraits = [.bold]
 let emphasisTraits: NSFontDescriptor.SymbolicTraits = [.italic]
 let boldEmphasisTraits: NSFontDescriptor.SymbolicTraits = [.bold, .italic]
 let secondaryBackground = NSColor(red: 255, green: 255, blue: 255, alpha: 0.14)
+let secondaryBackgroundWithoutTransparency = NSColor(red: 87, green: 87, blue: 87, alpha: 1)
 let lighterColor = NSColor.lightGray
 let textColor = NSColor.labelColor
 #else
@@ -64,14 +65,14 @@ public extension Sequence where Iterator.Element == HighlightRule {
                 pattern: inlineCodeRegex,
                 formattingRules: [
                     TextFormattingRule(key: .font, value: codeFont),
-                    TextFormattingRule(key: .backgroundColor, value: secondaryBackground)
+                    TextFormattingRule(key: .backgroundColor, value: secondaryBackgroundWithoutTransparency)
                 ]
             ),
             HighlightRule(
                 pattern: betweenBackticksConverted,
                 formattingRules: [
                     TextFormattingRule(key: .font, value: codeFont),
-                    TextFormattingRule(key: .backgroundColor, value: secondaryBackground),
+                    TextFormattingRule(key: .backgroundColor, value: secondaryBackgroundWithoutTransparency),
                 ]
             ),
             HighlightRule(pattern: codeBlockRegex, formattingRule: TextFormattingRule(key: .font, value: codeFont)),
