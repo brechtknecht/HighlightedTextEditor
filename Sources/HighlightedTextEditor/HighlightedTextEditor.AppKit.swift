@@ -57,12 +57,15 @@ public struct HighlightedTextEditor: NSViewRepresentable, HighlightingTextEditor
         context.coordinator.updatingNSView = true
         let typingAttributes = view.textView.typingAttributes
         
+        // 👇 HERE IS WHERE THE TEXT GETS FORMATTED COMPLETELY. TRY TO EXCLUDE SOME PARTS
         let highlightedText = HighlightedTextEditor.getHighlightedText(
             text: text,
             highlightRules: highlightRules
         )
-        
+
         view.attributedText = highlightedText
+        
+//        print(view.attributedText)
         runIntrospect(view)
         view.selectedRanges = context.coordinator.selectedRanges
         view.textView.typingAttributes = typingAttributes
@@ -140,7 +143,19 @@ public extension HighlightedTextEditor {
         
         var attributedText: NSAttributedString {
             didSet {
-                textView.textStorage?.setAttributedString(attributedText)
+                // This is where the magic happens
+                let range = NSRange(
+                    location: 0,
+                    length: textView.textStorage?.length ?? 0
+                )
+                
+                print("Range of text in NSTextStorage \(range)")
+                guard let textStorageString = textView.textStorage?.attributedSubstring(from: range) else { return }
+                print("Edited String \(textStorageString)")
+                let mutableTextStorageString = NSMutableAttributedString(attributedString: textStorageString)
+                mutableTextStorageString.append(attributedText)
+                
+                textView.textStorage?.setAttributedString(mutableTextStorageString)
             }
         }
         
@@ -296,24 +311,24 @@ public extension HighlightedTextEditor {
 final class TokenLayoutManager: NSLayoutManager {
     var textContainerOriginOffset: CGSize = .zero
     
-    //    override func drawBackground(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
-    //        super.drawBackground(forGlyphRange: glyphsToShow, at: origin)
-    //
-    //        self.enumerateLineFragments(forGlyphRange: glyphsToShow) { (rect, usedRect, textContainer, glyphRange, stop) in
-    //
-    //            var lineRect = usedRect
-    //            lineRect.size.height = 30.0
-    //
-    //            let currentContext = NSGraphicsContext.current?.cgContext
-    //            currentContext?.saveGState()
-    //
-    //            currentContext?.setStrokeColor(NSColor.red.cgColor)
-    //            currentContext?.setLineWidth(1.0)
-    //            currentContext?.stroke(lineRect)
-    //
-    //            currentContext?.restoreGState()
-    //        }
-    //    }
+//    override func drawBackground(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
+//        super.drawBackground(forGlyphRange: glyphsToShow, at: origin)
+//
+//        self.enumerateLineFragments(forGlyphRange: glyphsToShow) { (rect, usedRect, textContainer, glyphRange, stop) in
+//
+//            var lineRect = usedRect
+//            lineRect.size.height = 30.0
+//
+//            let currentContext = NSGraphicsContext.current?.cgContext
+//            currentContext?.saveGState()
+//
+//            currentContext?.setStrokeColor(NSColor.red.cgColor)
+//            currentContext?.setLineWidth(1.0)
+//            currentContext?.stroke(lineRect)
+//
+//            currentContext?.restoreGState()
+//        }
+//    }
      
     override func drawGlyphs(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
         // DANGER ZONE #001 : Check this Range changes

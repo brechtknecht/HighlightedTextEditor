@@ -101,7 +101,7 @@ public typealias OnPasteCallback = EmptyCallback
 
 extension HighlightingTextEditor {
     var placeholderFont: SystemColorAlias { SystemColorAlias() }
-
+    
     static func getHighlightedText(text: String, highlightRules: [HighlightRule]) -> NSMutableAttributedString {
         let highlightedString = NSMutableAttributedString(string: text)
         let all = NSRange(location: 0, length: text.utf16.count)
@@ -149,5 +149,4 @@ extension HighlightingTextEditor {
         }
 
         return highlightedString
-    }
-}
+    }}
